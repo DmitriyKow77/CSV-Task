@@ -45,8 +45,6 @@ public class CsvLogic {
                 break;
             }
         }
-
-        this.records = records;
     }
 
     public void calculateExpressionResult(){
@@ -77,11 +75,8 @@ public class CsvLogic {
                 String cCell = row.get(cColumn).toLowerCase();
                 String reversed = reverseString(cCell);
 
-                if (cCell.equals(reversed) && !cCell.isEmpty()) {
-                    row.add("true");
-                } else {
-                    row.add("false");
-                }
+                boolean isPolindrome = cCell.equals(reversed) && !cCell.isEmpty();
+                row.add(String.valueOf(isPolindrome));
             }
         }
     }
