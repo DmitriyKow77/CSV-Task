@@ -1,23 +1,20 @@
 import org.apache.commons.lang3.math.NumberUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by dmitriy on 7/12/19.
  */
-public class CsvLogic {
-    private final static String[] resultColumns = {"Expression Result", "Is Palindrome", "Reversed String"};
+class CsvTableBuilder {
+    private final String[] resultColumns = {"Expression Result", "Is Palindrome", "Reversed String"};
     private ArrayList<List<String>> records;
 
-    public CsvLogic(ArrayList<List<String>> records) {
+    CsvTableBuilder(ArrayList<List<String>> records) {
         this.records = records;
     }
 
-    public  ArrayList<List<String>> getRecords(){
-        return this.records;
-    }
-
-    public void cleanEmptyCells(){
+    CsvTableBuilder cleanEmptyCells(){
         ArrayList<List<String>> cleanRecords = new ArrayList<List<String>>();
 
         int i = 0;
@@ -32,22 +29,22 @@ public class CsvLogic {
         }
 
         this.records = cleanRecords;
+        return this;
     }
 
-    public void addColumnTitles(){
+    CsvTableBuilder addColumnTitles(){
         final String titleColumnIndicator = "A, B, C";
 
-        for (int i = 0; i < records.size(); i++) {
-            if (records.get(i).toString().contains(titleColumnIndicator)){
-                for (String column : CsvLogic.resultColumns){
-                    records.get(i).add(column);
-                }
+        for (List<String> record : records) {
+            if (record.toString().contains(titleColumnIndicator)) {
+                Collections.addAll(record, resultColumns);
                 break;
             }
         }
+        return this;
     }
 
-    public void calculateExpressionResult(){
+    CsvTableBuilder calculateExpressionResult(){
         int aColumn = getColumnNumber( "A");
         int bColumn = getColumnNumber( "B");
 
@@ -63,11 +60,12 @@ public class CsvLogic {
                 }
             }
         }
+        return this;
     }
 
-    public void checkPalindrome() {
+    CsvTableBuilder checkPalindrome() {
         int cColumn = getColumnNumber( "C");
-        int startRow = getRowNumber(CsvLogic.resultColumns[1]) + 1;
+        int startRow = getRowNumber(resultColumns[1]) + 1;
         
         for (int i = startRow; i < records.size(); i++){
             List<String> row = records.get(i);
@@ -79,6 +77,24 @@ public class CsvLogic {
                 row.add(String.valueOf(isPolindrome));
             }
         }
+        return this;
+    }
+
+    CsvTableBuilder addReversedString() {
+        int startRow = getRowNumber(resultColumns[1]) + 1;
+        int cColumn = getColumnNumber( "C");
+
+        this.records.stream()
+                .skip(startRow)
+                .forEach(row -> {
+                    String cell = row.get(cColumn);
+                    row.add(reverseString(cell));
+                });
+        return this;
+    }
+
+    ArrayList<List<String>> build(){
+        return this.records;
     }
 
     private static String reverseString(String string) {
@@ -109,17 +125,5 @@ public class CsvLogic {
             }
         }
         return columnNumber;
-    }
-
-    public void addReversedString() {
-        int startRow = getRowNumber(CsvLogic.resultColumns[1]) + 1;
-        int cColumn = getColumnNumber( "C");
-
-        this.records.stream()
-                .skip(startRow)
-                .forEach(row -> {
-                    String cell = row.get(cColumn);
-                    row.add(reverseString(cell));
-                });
     }
 }

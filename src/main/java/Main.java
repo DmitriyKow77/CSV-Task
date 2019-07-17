@@ -17,18 +17,20 @@ public class Main {
         }
         csvOutFilePath = csvInFilePath.replace("CsvInput", "CsvOutput");
 
-        ArrayList<List<String>> records;
+        ArrayList<List<String>> initialRecord;
         CsvHelper csvHelper = new CsvHelper(csvInFilePath, csvOutFilePath);
-        records = csvHelper.readCsvFile();
+        initialRecord = csvHelper.readCsvFile();
 
-        CsvLogic csvLogic = new CsvLogic(records);
+        CsvTableBuilder csvTableBuilder = new CsvTableBuilder(initialRecord);
 
-        csvLogic.cleanEmptyCells();
-        csvLogic.addColumnTitles();
-        csvLogic.calculateExpressionResult();
-        csvLogic.checkPalindrome();
-        csvLogic.addReversedString();
+        ArrayList<List<String>> processedRecords = csvTableBuilder
+                .cleanEmptyCells()
+                .addColumnTitles()
+                .calculateExpressionResult()
+                .checkPalindrome()
+                .addReversedString()
+                .build();
 
-        csvHelper.writeCsvFile(csvLogic.getRecords());
+        csvHelper.writeCsvFile(processedRecords);
     }
 }
